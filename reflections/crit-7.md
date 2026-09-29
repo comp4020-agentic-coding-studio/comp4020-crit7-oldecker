@@ -1,0 +1,8 @@
+ok so it looks a little shit after the first draft, the idea is nice but it's not really what i was looking for.
+its very much unfinished. It looks like it understood to make the teachers page where you can setup assignments instead of finishing them. and uploading.
+
+update since then: the teacher/student split is actually finished now. students get a read-only assessments list on their course page with a "turn in" box (text or a file) per assessment, teachers get their own separate mock page for setting assessments up — no login, just a link, but at least the two jobs aren't mashed into one page and one form anymore.
+
+also went back and fixed the thing that was bugging me about canvas in the first place: the home page now has a mini calendar and a due-list that pulls every course's assignments and exams into one place, instead of having to check three differently laid-out course pages. assessments also got a proper kind (assignment vs exam) and a description of what's actually required, and you can't set a weight that pushes a course over 100% anymore — it caps at whatever's left, which the flat 0-100% picker from the first draft never checked. each course also has a full 12-week mock lecture list now instead of just the current week's reading.
+
+visually it's closer to what i meant by "make it look like the real 4020 page" — riso-print-ish palette, proper heading font, cards instead of plain lists. couldn't get actual generated images in though, there's no image-proxy key set up in this environment and reusing the coding session's own key for that got blocked (rightly), so the hero graphic is CSS/SVG instead of a real photo. would swap that for a real one if i wire up a key.
