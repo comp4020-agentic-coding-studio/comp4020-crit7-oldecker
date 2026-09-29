@@ -1,61 +1,226 @@
-body {
-  margin: 0;
-  padding: 2rem;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
-  color: #1a1a1a;
+/* Riso-print palette: warm paper stock, three inks (teal, gold, copper). No
+   grey — a muted, ink-mixed brown stands in wherever a neutral is needed, so
+   the page reads as "printed", not "software". */
+:root {
+  --paper: #f6f0e1;
+  --paper-raised: #fffcf4;
+  --ink: #221b12;
+  --ink-soft: #5b4d3c;
+  --teal: #0f6e68;
+  --teal-deep: #0b4f4b;
+  --gold: #dd9f13;
+  --gold-deep: #8a6308;
+  --copper: #bd5a34;
+  --copper-deep: #7d3a1e;
+  --line: rgba(34, 27, 18, 0.16);
+  --content-width: 58rem;
+  --radius: 3px;
 }
 
-main {
-  max-width: 40rem;
-  margin: 0 auto;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Public Sans", system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Bricolage Grotesque", "Public Sans", system-ui, sans-serif;
+  line-height: 1.15;
+  margin-block: 0 0.5rem;
+}
+
+h1 {
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+}
+
+p {
+  max-width: 42rem;
 }
 
 a {
-  color: #0b5fff;
+  color: var(--teal-deep);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--copper-deep);
+}
+
+main {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1.25rem 3rem;
+}
+
+/* Top nav — a solid ink band, not a floating card; the one place the paper
+   texture stops and a printed ribbon begins. */
+nav[aria-label="site"] {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--teal-deep);
+}
+
+nav[aria-label="site"] a {
+  color: var(--paper);
+  text-decoration: none;
+  font-weight: 600;
+  padding-block: 0.15rem;
+  border-bottom: 2px solid transparent;
+}
+
+nav[aria-label="site"] a:hover,
+nav[aria-label="site"] a:focus-visible {
+  border-bottom-color: var(--gold);
+  color: var(--paper);
+}
+
+/* Hero band — the one bold move on the page: a halftone dot field behind the
+   dashboard's own headline, contained to this band only. */
+.hero {
+  position: relative;
+  margin: 0 -1.25rem 2rem;
+  padding: 2.5rem 1.25rem 2rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(circle, var(--gold) 1.3px, transparent 1.4px);
+  background-size: 15px 15px;
+  opacity: 0.4;
+}
+
+.hero h1 {
+  margin-block-end: 0.4rem;
+}
+
+.hero-sub {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  max-width: 34rem;
+}
+
+.registration-mark {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 form {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
   align-items: center;
-  margin-block: 1.5rem;
+  margin-block: 1.25rem;
 }
 
-input {
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+input,
+select,
+textarea {
   flex: 1;
   min-width: 12rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.6rem;
   font: inherit;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
 
 button {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.1rem;
   font: inherit;
+  font-weight: 700;
+  color: var(--paper);
+  background: var(--teal-deep);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
 }
 
-/* Course grid — the home dashboard's list of courses */
+button:hover {
+  background: var(--copper-deep);
+}
+
+.form-hint {
+  flex-basis: 100%;
+  margin: -0.3rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Course grid — the home dashboard's list of courses, printed as a stack of
+   registration cards: a solid ink offset instead of a soft grey shadow. */
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
   margin-block: 1rem 2rem;
 }
 
 .course-card {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
+  gap: 0.3rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 5px 5px 0 var(--teal);
   text-decoration: none;
-  color: inherit;
+  color: var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .course-card:hover {
-  border-color: #0b5fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--copper);
+  border-color: var(--ink);
+}
+
+.course-card strong {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.1rem;
+  color: var(--teal-deep);
 }
 
 /* Due-soon list — the home dashboard's cross-course deadline feed */
@@ -72,42 +237,160 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--paper-raised);
+  border-left: 3px solid var(--line);
+  border-radius: var(--radius);
 }
 
-/* Status badges — always paired with a text label, never color alone */
+/* Status badges — always paired with a text label, never color alone.
+   Due-status is a solid pill; assessment kind is an outlined tag — two
+   distinct shapes so the two badge systems never get mistaken for each
+   other, on top of both always carrying their own text. */
 .badge {
   display: inline-block;
-  padding: 0.1rem 0.5rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .badge--overdue {
-  background: #fde2e2;
-  color: #8a1f1f;
-  border-color: #f3b4b4;
+  background: var(--copper);
+  color: #fff;
 }
 
 .badge--due-soon {
-  background: #fff3cd;
-  color: #7a5b00;
-  border-color: #f0d999;
+  background: var(--gold);
+  color: var(--ink);
 }
 
 .badge--upcoming {
-  background: #e5f0ff;
-  color: #0b3d91;
-  border-color: #b8d4ff;
+  background: var(--teal);
+  color: #fff;
+}
+
+.badge--kind-assignment,
+.badge--kind-exam {
+  background: transparent;
+  border-radius: 0.2rem;
+  border-width: 1.5px;
+}
+
+.badge--kind-assignment {
+  color: var(--teal-deep);
+  border-color: var(--teal);
+}
+
+.badge--kind-exam {
+  color: var(--copper-deep);
+  border-color: var(--copper);
+}
+
+/* Calendar — six weeks of Mon-Sun, today marked, each due item a chip that
+   always names its own kind in text. */
+.calendar {
+  margin-block: 1rem 2rem;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--paper-raised);
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--teal-deep);
+  color: var(--paper);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.calendar-weekdays span {
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  min-height: 4.5rem;
+  padding: 0.35rem 0.4rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.calendar-day--today {
+  background: color-mix(in srgb, var(--gold) 18%, var(--paper-raised));
+}
+
+.calendar-date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.calendar-today-label {
+  color: var(--copper-deep);
+}
+
+.calendar-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cal-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.2rem;
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+.cal-chip strong {
+  font-size: 0.65rem;
+}
+
+.cal-chip--assignment {
+  background: color-mix(in srgb, var(--teal) 16%, var(--paper-raised));
+  color: var(--teal-deep);
+}
+
+.cal-chip--exam {
+  background: color-mix(in srgb, var(--copper) 20%, var(--paper-raised));
+  color: var(--copper-deep);
+}
+
+@media (max-width: 40rem) {
+  .calendar-weekdays span:nth-child(n) {
+    font-size: 0.7rem;
+  }
+
+  .cal-chip span {
+    display: none;
+  }
 }
 
 /* Course page sections — the one shared template every course renders through */
 .section {
-  margin-block: 2rem;
-  padding-block-start: 1rem;
-  border-top: 1px solid #eee;
+  margin-block: 2.25rem;
+  padding-block-start: 1.25rem;
+  border-top: 1px solid var(--line);
 }
 
 .assessment-list,
@@ -116,7 +399,12 @@ button {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
+}
+
+.resource-item {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius);
 }
 
 .assessment-item,
@@ -128,43 +416,54 @@ button {
 }
 
 .resource-item--current {
-  font-weight: 600;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
 }
 
-/* An assessment plus its read-only submission list and (student-side) submit box */
+/* An assessment plus its description, read-only submission list and
+   (student-side) submit box */
 .assessment-item-block {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding-block: 0.4rem;
+  gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.assessment-description {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
 }
 
 .submission-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 0 1.5rem;
+  margin: 0 0 0 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  font-size: 0.9rem;
-  color: #444;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
 }
 
 .submit-form {
-  margin-block: 0.3rem 0;
+  margin-block: 0.2rem 0;
 }
 
 .submit-form textarea {
   flex: 1 1 100%;
   min-width: 12rem;
-  padding: 0.4rem 0.6rem;
-  font: inherit;
 }
 
 /* Teacher-mode's "this isn't really locked" disclosure */
 .mode-banner {
-  padding: 0.5rem 0.75rem;
-  background: #f3f3f3;
-  border-radius: 0.4rem;
+  padding: 0.6rem 0.85rem;
+  background: color-mix(in srgb, var(--copper) 12%, var(--paper-raised));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   font-size: 0.9rem;
+  color: var(--ink-soft);
 }

@@ -82,6 +82,8 @@ export function listUpcomingAssessments(limit = 8): UpcomingAssessment[] {
       title: assessments.title,
       dueDate: assessments.dueDate,
       weight: assessments.weight,
+      kind: assessments.kind,
+      description: assessments.description,
       courseCode: courses.code,
       courseTitle: courses.title,
     })
@@ -97,8 +99,18 @@ export function addAssessment(input: {
   title: string;
   dueDate: string;
   weight: number | null;
+  kind: "assignment" | "exam";
+  description: string | null;
 }): Assessment {
   return db.insert(assessments).values(input).returning().get();
+}
+
+// The teacher-mode form needs to know how much of a course's 100% is still
+// unclaimed before it lets you pick a weight — a single flat SUM is enough
+// ground truth for that; no assessment kind is excluded because exams and
+// assignments draw from the same 100%.
+export function totalAssessmentWeight(courseId: number): number {
+  return listAssessmentsForCourse(courseId).reduce((sum, a) => sum + (a.weight ?? 0), 0);
 }
 
 export function getSubmissionById(id: number): Submission | undefined {

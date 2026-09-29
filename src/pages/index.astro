@@ -1,16 +1,31 @@
 ---
+import WeekCalendar from "../components/WeekCalendar.astro";
 import Base from "../layouts/Base.astro";
 import { listCourses, listUpcomingAssessments } from "../lib/db";
 import { dueStatus } from "../lib/dates";
 
 const courses = listCourses();
-const dueSoon = listUpcomingAssessments(8);
+// One ascending, all-courses list feeds both views: the top slice for "what's
+// due" and the full set for the calendar window below it.
+const allUpcoming = listUpcomingAssessments(50);
+const dueSoon = allUpcoming.slice(0, 8);
 
 const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upcoming" } as const;
 ---
 
 <Base title="My courses">
-  <h1>What's due</h1>
+  <div class="hero">
+    <svg class="registration-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <circle cx="22" cy="22" r="14" fill="none" stroke="var(--teal)" stroke-width="1.5" />
+      <circle cx="26" cy="24" r="14" fill="none" stroke="var(--copper)" stroke-width="1.5" />
+      <circle cx="24" cy="26" r="14" fill="none" stroke="var(--gold)" stroke-width="1.5" />
+    </svg>
+    <h1>What's due</h1>
+    <p class="hero-sub">
+      Every assignment and exam across your enrolled courses, gathered in one list instead of three
+      differently-organised course pages.
+    </p>
+  </div>
   {
     dueSoon.length === 0 ? (
       <p>Nothing due — enjoy it while it lasts.</p>
@@ -30,6 +45,9 @@ const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upc
       </ul>
     )
   }
+
+  <h2>Calendar</h2>
+  <WeekCalendar assessments={allUpcoming} weeks={6} />
 
   <h2>Courses</h2>
   <div class="course-grid">

@@ -4,11 +4,11 @@ import type { Assessment, Course, Resource, Submission } from "../lib/db";
 
 // The one shared body every course renders through, for both the student
 // page and its teacher-mode counterpart — same Overview/This week/
-// Assessments/All resources sections in the same order either way. The only
-// content difference is `teacherMode`: it swaps the per-assessment submit
-// box for the add-assessment form. Keeping this in one component instead of
-// two page files is what makes "basically the same page" true rather than
-// two things a future edit can quietly pull apart.
+// Assessments/Lectures/Readings & materials sections in the same order
+// either way. The only content difference is `teacherMode`: it swaps the
+// per-assessment submit box for the add-assessment form. Keeping this in one
+// component instead of two page files is what makes "basically the same
+// page" true rather than two things a future edit can quietly pull apart.
 interface Props {
   course: Course;
   assessments: Assessment[];
@@ -21,7 +21,15 @@ interface Props {
 const { course, assessments, resources, currentWeek, submissionsByAssessment, teacherMode } = Astro.props;
 
 const thisWeek = currentWeek ? resources.filter((r) => r.week === currentWeek) : [];
+const lectures = resources.filter((r) => r.kind === "lecture");
+const otherResources = resources.filter((r) => r.kind !== "lecture");
 const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upcoming" } as const;
+const kindLabel = { assignment: "Assignment", exam: "Exam" } as const;
+
+// A weight typed in isolation is how a course ends up worth 140% — the form
+// only ever offers however much of 100% this course hasn't already spent.
+const totalWeight = assessments.reduce((sum, a) => sum + (a.weight ?? 0), 0);
+const weightRemaining = Math.max(0, 100 - totalWeight);
 ---
 
 <h1>{course.code} — {course.title}</h1>
@@ -61,10 +69,14 @@ const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upc
             <li class="assessment-item-block">
               <div class="assessment-item">
                 <span class={`badge badge--${status}`}>{statusLabel[status]}</span>
+                <span class={`badge badge--kind-${a.kind}`}>
+                  {kindLabel[a.kind as keyof typeof kindLabel] ?? a.kind}
+                </span>
                 <span>{a.title}</span>
                 <time datetime={a.dueDate}>{a.dueDate}</time>
                 {a.weight !== null && <span>{a.weight}%</span>}
               </div>
+              {a.description && <p class="assessment-description">{a.description}</p>}
               {subs.length > 0 && (
                 <ul class="submission-list">
                   {subs.map((s) => (
@@ -98,10 +110,20 @@ const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upc
         <input type="hidden" name="courseId" value={course.id} />
         <label for="title">Title</label>
         <input id="title" name="title" required maxlength="200" />
+        <label for="kind">Kind</label>
+        <select id="kind" name="kind">
+          <option value="assignment">Assignment</option>
+          <option value="exam">Exam</option>
+        </select>
         <label for="dueDate">Due date</label>
         <input id="dueDate" name="dueDate" type="date" required />
         <label for="weight">Weight %</label>
-        <input id="weight" name="weight" type="number" min="0" max="100" />
+        <input id="weight" name="weight" type="number" min="0" max={weightRemaining} />
+        <p class="form-hint">
+          {weightRemaining}% left to allocate across this course's assessments ({totalWeight}% already spoken for).
+        </p>
+        <label for="description">What's involved</label>
+        <textarea id="description" name="description" rows="2" maxlength="2000"></textarea>
         <button>Add assessment</button>
       </form>
     )
@@ -109,13 +131,30 @@ const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upc
 </section>
 
 <section class="section">
-  <h2>All resources</h2>
+  <h2>Lectures</h2>
   {
-    resources.length === 0 ? (
-      <p>No resources yet.</p>
+    lectures.length === 0 ? (
+      <p>No lectures scheduled yet.</p>
     ) : (
       <ul class="resource-list">
-        {resources.map((r) => (
+        {lectures.map((r) => (
+          <li class={`resource-item${r.week === currentWeek ? " resource-item--current" : ""}`}>
+            week {r.week}: {r.url ? <a href={r.url}>{r.title}</a> : r.title}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+<section class="section">
+  <h2>Readings & materials</h2>
+  {
+    otherResources.length === 0 ? (
+      <p>No other resources yet.</p>
+    ) : (
+      <ul class="resource-list">
+        {otherResources.map((r) => (
           <li class={`resource-item${r.week === currentWeek ? " resource-item--current" : ""}`}>
             week {r.week}: {r.url ? <a href={r.url}>{r.title}</a> : r.title}
           </li>

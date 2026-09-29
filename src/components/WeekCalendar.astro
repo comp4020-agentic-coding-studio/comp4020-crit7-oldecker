@@ -1,0 +1,63 @@
+---
+import { addDaysISO, calendarDays } from "../lib/dates";
+import type { UpcomingAssessment } from "../lib/db";
+
+// A flat "what's due" list makes you scan every row to spot a clash; a
+// calendar makes the same clash visible at a glance. Kind (assignment/exam)
+// is always shown as a text label on the chip, never as color alone — same
+// rule as the .badge system elsewhere on this page.
+interface Props {
+  assessments: UpcomingAssessment[];
+  weeks?: number;
+}
+
+const { assessments, weeks = 6 } = Astro.props;
+const days = calendarDays(weeks);
+const today = addDaysISO(0);
+
+const byDate = new Map<string, UpcomingAssessment[]>();
+for (const a of assessments) {
+  if (!days.includes(a.dueDate)) continue;
+  const list = byDate.get(a.dueDate) ?? [];
+  list.push(a);
+  byDate.set(a.dueDate, list);
+}
+
+const kindLabel = { assignment: "Assignment", exam: "Exam" } as const;
+const fmt = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", timeZone: "UTC" });
+const dayLabel = (iso: string) => fmt.format(new Date(`${iso}T00:00:00Z`));
+---
+
+<div class="calendar">
+  <div class="calendar-weekdays">
+    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => <span>{d}</span>)}
+  </div>
+  <div class="calendar-grid">
+    {
+      days.map((iso) => {
+        const due = byDate.get(iso) ?? [];
+        const isToday = iso === today;
+        return (
+          <div class={`calendar-day${isToday ? " calendar-day--today" : ""}`}>
+            <span class="calendar-date">
+              {dayLabel(iso)}
+              {isToday && <span class="calendar-today-label"> · today</span>}
+            </span>
+            {due.length > 0 && (
+              <ul class="calendar-chips">
+                {due.map((a) => (
+                  <li class={`cal-chip cal-chip--${a.kind}`}>
+                    <strong>{kindLabel[a.kind as keyof typeof kindLabel] ?? a.kind}</strong>
+                    <span>
+                      {a.courseCode}: {a.title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+</div>

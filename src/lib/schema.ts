@@ -31,6 +31,8 @@ export const assessments = sqliteTable("assessments", {
   title: text().notNull(),
   dueDate: text("due_date").notNull(), // ISO date "YYYY-MM-DD"
   weight: int(), // percent, nullable — not every assessment is graded
+  kind: text().notNull().default("assignment"), // "assignment" | "exam" — how the calendar tells them apart
+  description: text(), // nullable — what the assessment actually asks for
 });
 
 export const resources = sqliteTable("resources", {

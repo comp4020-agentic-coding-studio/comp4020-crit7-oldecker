@@ -48,4 +48,18 @@ describe("assessments", () => {
     const res = await fetch(baseUrl);
     expect(await res.text()).toContain(title);
   });
+
+  it("rejects a weight that would push the course's assessments over 100%", async () => {
+    // COMP4020's seeded assessments already total 80% (src/lib/seed.ts), so
+    // there's only 20% left to allocate — 50% must be refused even though a
+    // flat 0-100 range would allow it on its own.
+    const overweightTitle = `spec overweight probe ${process.hrtime.bigint()}`;
+    const res = await post(
+      new URLSearchParams({ courseId: String(COURSE_ID), title: overweightTitle, dueDate, weight: "50" }),
+    );
+    expect(res.status).toBe(303);
+
+    const page = await fetch(new URL(`/courses/${COURSE_CODE}/`, baseUrl));
+    expect(await page.text()).not.toContain(overweightTitle);
+  });
 });

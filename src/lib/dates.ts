@@ -27,6 +27,13 @@ export function currentWeekFor(termStart: string, now: Date = new Date()): numbe
   return week >= 1 && week <= TEACHING_WEEKS ? week : null;
 }
 
+/** ISO dates for `weeks` full Mon-Sun weeks, starting the Monday on/before `now`. */
+export function calendarDays(weeks: number, now: Date = new Date()): string[] {
+  const dayOfWeek = now.getUTCDay(); // 0 = Sunday .. 6 = Saturday
+  const mondayOffset = -((dayOfWeek + 6) % 7);
+  return Array.from({ length: weeks * 7 }, (_, i) => addDaysISO(mondayOffset + i, now));
+}
+
 export type DueStatus = "overdue" | "due-soon" | "upcoming";
 
 /** overdue: past due · due-soon: due within 7 days · upcoming: further out. */
