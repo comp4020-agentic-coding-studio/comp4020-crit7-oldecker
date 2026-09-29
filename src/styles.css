@@ -130,3 +130,41 @@ button {
 .resource-item--current {
   font-weight: 600;
 }
+
+/* An assessment plus its read-only submission list and (student-side) submit box */
+.assessment-item-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-block: 0.4rem;
+}
+
+.submission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.submit-form {
+  margin-block: 0.3rem 0;
+}
+
+.submit-form textarea {
+  flex: 1 1 100%;
+  min-width: 12rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+}
+
+/* Teacher-mode's "this isn't really locked" disclosure */
+.mode-banner {
+  padding: 0.5rem 0.75rem;
+  background: #f3f3f3;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+}

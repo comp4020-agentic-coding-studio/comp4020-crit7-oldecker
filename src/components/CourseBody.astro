@@ -1,0 +1,145 @@
+---
+import { dueStatus } from "../lib/dates";
+import type { Assessment, Course, Resource, Submission } from "../lib/db";
+
+// The one shared body every course renders through, for both the student
+// page and its teacher-mode counterpart — same Overview/This week/
+// Assessments/All resources sections in the same order either way. The only
+// content difference is `teacherMode`: it swaps the per-assessment submit
+// box for the add-assessment form. Keeping this in one component instead of
+// two page files is what makes "basically the same page" true rather than
+// two things a future edit can quietly pull apart.
+interface Props {
+  course: Course;
+  assessments: Assessment[];
+  resources: Resource[];
+  currentWeek: number | null;
+  submissionsByAssessment: Map<number, Submission[]>;
+  teacherMode: boolean;
+}
+
+const { course, assessments, resources, currentWeek, submissionsByAssessment, teacherMode } = Astro.props;
+
+const thisWeek = currentWeek ? resources.filter((r) => r.week === currentWeek) : [];
+const statusLabel = { overdue: "Overdue", "due-soon": "Due soon", upcoming: "Upcoming" } as const;
+---
+
+<h1>{course.code} — {course.title}</h1>
+
+<section class="section">
+  <h2>Overview</h2>
+  <p>{course.overview}</p>
+  <p>{course.term}</p>
+</section>
+
+<section class="section">
+  <h2>This week{currentWeek ? ` (week ${currentWeek})` : ""}</h2>
+  {
+    currentWeek === null ? (
+      <p>Outside teaching weeks.</p>
+    ) : thisWeek.length === 0 ? (
+      <p>No resources tagged for week {currentWeek} yet.</p>
+    ) : (
+      <ul class="resource-list">
+        {thisWeek.map((r) => <li class="resource-item">{r.url ? <a href={r.url}>{r.title}</a> : r.title}</li>)}
+      </ul>
+    )
+  }
+</section>
+
+<section class="section">
+  <h2>Assessments</h2>
+  {
+    assessments.length === 0 ? (
+      <p>No assessments yet.</p>
+    ) : (
+      <ul class="assessment-list">
+        {assessments.map((a) => {
+          const status = dueStatus(a.dueDate);
+          const subs = submissionsByAssessment.get(a.id) ?? [];
+          return (
+            <li class="assessment-item-block">
+              <div class="assessment-item">
+                <span class={`badge badge--${status}`}>{statusLabel[status]}</span>
+                <span>{a.title}</span>
+                <time datetime={a.dueDate}>{a.dueDate}</time>
+                {a.weight !== null && <span>{a.weight}%</span>}
+              </div>
+              {subs.length > 0 && (
+                <ul class="submission-list">
+                  {subs.map((s) => (
+                    <li class="submission-item">
+                      {s.fileName ? <a href={`/api/submissions/${s.id}/file`}>{s.fileName}</a> : s.textContent}
+                      <time datetime={s.submittedAt}> — submitted {s.submittedAt.slice(0, 16).replace("T", " ")}</time>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {!teacherMode && (
+                <form class="submit-form" method="post" action="/api/submissions" enctype="multipart/form-data">
+                  <input type="hidden" name="assessmentId" value={a.id} />
+                  <label for={`text-${a.id}`}>Turn in text</label>
+                  <textarea id={`text-${a.id}`} name="text" rows="2"></textarea>
+                  <label for={`file-${a.id}`}>or a file</label>
+                  <input id={`file-${a.id}`} name="file" type="file" accept=".pdf,.txt,text/plain,application/pdf" />
+                  <button>Submit</button>
+                </form>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+
+  {
+    teacherMode && (
+      <form method="post" action="/api/assessments">
+        <input type="hidden" name="courseId" value={course.id} />
+        <label for="title">Title</label>
+        <input id="title" name="title" required maxlength="200" />
+        <label for="dueDate">Due date</label>
+        <input id="dueDate" name="dueDate" type="date" required />
+        <label for="weight">Weight %</label>
+        <input id="weight" name="weight" type="number" min="0" max="100" />
+        <button>Add assessment</button>
+      </form>
+    )
+  }
+</section>
+
+<section class="section">
+  <h2>All resources</h2>
+  {
+    resources.length === 0 ? (
+      <p>No resources yet.</p>
+    ) : (
+      <ul class="resource-list">
+        {resources.map((r) => (
+          <li class={`resource-item${r.week === currentWeek ? " resource-item--current" : ""}`}>
+            week {r.week}: {r.url ? <a href={r.url}>{r.title}</a> : r.title}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+<section class="section">
+  {
+    teacherMode ? (
+      <>
+        <p class="mode-banner">
+          Mock staff view — no login, anyone with this link can add assessments here.
+        </p>
+        <p>
+          <a href={`/courses/${course.code}/`}>Back to student view</a>
+        </p>
+      </>
+    ) : (
+      <p>
+        <a href={`/courses/${course.code}/teacher/`}>Teacher mode</a>
+      </p>
+    )
+  }
+</section>

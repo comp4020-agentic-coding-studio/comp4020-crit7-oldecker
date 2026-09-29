@@ -5,7 +5,16 @@ import { asc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { seedIfEmpty } from "./seed";
-import { type Assessment, type Course, type Resource, assessments, courses, resources } from "./schema";
+import {
+  type Assessment,
+  type Course,
+  type Resource,
+  type Submission,
+  assessments,
+  courses,
+  resources,
+  submissions,
+} from "./schema";
 
 // One SQLite file is the app's whole persistent state. In production
 // fly.toml points DATABASE_PATH at the machine's volume (/data), which is
@@ -30,7 +39,7 @@ migrate(db, { migrationsFolder: "./drizzle" });
 // seedIfEmpty is a no-op once a database already has courses in it.
 seedIfEmpty(db);
 
-export type { Course, Assessment, Resource };
+export type { Course, Assessment, Resource, Submission };
 
 export function listCourses(): Course[] {
   return db.select().from(courses).orderBy(asc(courses.code)).all();
@@ -51,6 +60,10 @@ export function listAssessmentsForCourse(courseId: number): Assessment[] {
     .where(eq(assessments.courseId, courseId))
     .orderBy(asc(assessments.dueDate))
     .all();
+}
+
+export function getAssessmentById(id: number): Assessment | undefined {
+  return db.select().from(assessments).where(eq(assessments.id, id)).get();
 }
 
 export function listResourcesForCourse(courseId: number): Resource[] {
@@ -86,4 +99,31 @@ export function addAssessment(input: {
   weight: number | null;
 }): Assessment {
   return db.insert(assessments).values(input).returning().get();
+}
+
+export function getSubmissionById(id: number): Submission | undefined {
+  return db.select().from(submissions).where(eq(submissions.id, id)).get();
+}
+
+export function listSubmissionsForAssessment(assessmentId: number): Submission[] {
+  return db
+    .select()
+    .from(submissions)
+    .where(eq(submissions.assessmentId, assessmentId))
+    .orderBy(asc(submissions.id))
+    .all();
+}
+
+export function addSubmission(input: {
+  assessmentId: number;
+  textContent: string | null;
+  fileName: string | null;
+  fileType: string | null;
+  fileData: Buffer | null;
+}): Submission {
+  return db
+    .insert(submissions)
+    .values({ ...input, submittedAt: new Date().toISOString() })
+    .returning()
+    .get();
 }

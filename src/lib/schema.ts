@@ -1,4 +1,4 @@
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // The schema is the ground truth for the database. To change it: edit here,
 // run `pnpm db:generate` to turn the diff into a migration under drizzle/,
@@ -44,6 +44,23 @@ export const resources = sqliteTable("resources", {
   kind: text().notNull().default("reading"), // "lecture" | "reading" | "lab"
 });
 
+// A student "turns in" work against a specific assessment — text, a file, or
+// both. No login exists in this prototype, so there's no owner column: every
+// visitor sees the same flat list of what's been submitted, same as everyone
+// sees the same assessments.
+export const submissions = sqliteTable("submissions", {
+  id: int().primaryKey({ autoIncrement: true }),
+  assessmentId: int("assessment_id")
+    .notNull()
+    .references(() => assessments.id, { onDelete: "cascade" }),
+  textContent: text("text_content"), // nullable — a file-only submission has none
+  fileName: text("file_name"),
+  fileType: text("file_type"), // MIME type, for Content-Type on download
+  fileData: blob("file_data", { mode: "buffer" }), // nullable — a text-only submission has none
+  submittedAt: text("submitted_at").notNull(), // ISO datetime, set at insert time
+});
+
 export type Course = typeof courses.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type Resource = typeof resources.$inferSelect;
+export type Submission = typeof submissions.$inferSelect;

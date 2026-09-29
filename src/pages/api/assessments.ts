@@ -24,9 +24,9 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   const weightValid = weight === null || (Number.isFinite(weight) && weight >= 0 && weight <= 100);
   if (!title || !isValidISODate(dueDate) || !weightValid) {
-    return redirect(`/courses/${course.code}/`, 303);
+    return redirect(`/courses/${course.code}/teacher/`, 303);
   }
 
   addAssessment({ courseId: course.id, title: title.slice(0, 200), dueDate, weight });
-  return redirect(`/courses/${course.code}/`, 303);
+  return redirect(`/courses/${course.code}/teacher/`, 303);
 };

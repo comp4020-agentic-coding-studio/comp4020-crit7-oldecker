@@ -1,0 +1,37 @@
+---
+import CourseBody from "../../../components/CourseBody.astro";
+import Base from "../../../layouts/Base.astro";
+import { currentWeekFor } from "../../../lib/dates";
+import {
+  getCourseByCode,
+  listAssessmentsForCourse,
+  listResourcesForCourse,
+  listSubmissionsForAssessment,
+} from "../../../lib/db";
+import type { Submission } from "../../../lib/db";
+
+const code = Astro.params.code!;
+const course = getCourseByCode(code);
+if (!course) {
+  return new Response("Course not found", { status: 404 });
+}
+
+const assessments = listAssessmentsForCourse(course.id);
+const resources = listResourcesForCourse(course.id);
+const currentWeek = currentWeekFor(course.termStart);
+
+const submissionsByAssessment = new Map<number, Submission[]>(
+  assessments.map((a) => [a.id, listSubmissionsForAssessment(a.id)]),
+);
+---
+
+<Base title={`${course.code} — Teacher mode`}>
+  <CourseBody
+    course={course}
+    assessments={assessments}
+    resources={resources}
+    currentWeek={currentWeek}
+    submissionsByAssessment={submissionsByAssessment}
+    teacherMode={true}
+  />
+</Base>

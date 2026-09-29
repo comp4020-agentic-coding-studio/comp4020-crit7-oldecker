@@ -33,10 +33,10 @@ describe("assessments", () => {
       redirect: "manual",
     });
 
-  it("accepts an assessment and redirects back to the course page", async () => {
+  it("accepts an assessment and redirects back to the teacher-mode course page", async () => {
     const res = await post(new URLSearchParams({ courseId: String(COURSE_ID), title, dueDate }));
     expect(res.status).toBe(303);
-    expect(res.headers.get("location")).toBe(`/courses/${COURSE_CODE}/`);
+    expect(res.headers.get("location")).toBe(`/courses/${COURSE_CODE}/teacher/`);
   });
 
   it("persists on the course page after a fresh load", async () => {
