@@ -43,6 +43,9 @@ Commit the file to this repo and link it with a **relative** path, which is what
 makes it render on GitHub: `![alt text](docs/before.png)`. Images don't count
 towards the word count and don't replace the citation.
 
+
+so i started by giving some ideas about what id like to change about the general layout and stucturing of canvas, because I feel like canvas is lacking some uniformality in terms of how specificly courses are set up. this differs between the coureses and is a little annoying to me right now. 
+
 ## Before you ship
 
 `pnpm check:evidence` verifies that this comment is gone, that your citations

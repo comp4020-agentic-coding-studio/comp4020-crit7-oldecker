@@ -35,6 +35,98 @@ button {
   font: inherit;
 }
 
-#messages {
-  padding-inline-start: 1.2rem;
+/* Course grid — the home dashboard's list of courses */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-block: 1rem 2rem;
+}
+
+.course-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.course-card:hover {
+  border-color: #0b5fff;
+}
+
+/* Due-soon list — the home dashboard's cross-course deadline feed */
+.due-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-block: 1rem 2rem;
+}
+
+.due-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Status badges — always paired with a text label, never color alone */
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.badge--overdue {
+  background: #fde2e2;
+  color: #8a1f1f;
+  border-color: #f3b4b4;
+}
+
+.badge--due-soon {
+  background: #fff3cd;
+  color: #7a5b00;
+  border-color: #f0d999;
+}
+
+.badge--upcoming {
+  background: #e5f0ff;
+  color: #0b3d91;
+  border-color: #b8d4ff;
+}
+
+/* Course page sections — the one shared template every course renders through */
+.section {
+  margin-block: 2rem;
+  padding-block-start: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.assessment-list,
+.resource-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.assessment-item,
+.due-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resource-item--current {
+  font-weight: 600;
 }
